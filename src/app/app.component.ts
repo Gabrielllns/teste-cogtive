@@ -5,7 +5,7 @@ import { ProbeControl } from './interface/probe-control-interface';
 import { MeshConfiguration } from './interface/mesh-configuration-interface';
 
 import { MessageService } from './service/message.service';
-import { TestingStageService, TestingStage } from './service/testing-stage.service';
+import { StageService, Stage } from './service/stage.service';
 
 /**
  * Component responsável pelas lógicas de controle do componente 'App'.
@@ -27,12 +27,12 @@ export class AppComponent {
   /**
    * Construtor do componente.
    *
-   * @param testingStageService
+   * @param stageService
    */
-  constructor(private testingStageService: TestingStageService) {
+  constructor(private stageService: StageService) {
 
     this.meshConfigurations = {
-      testingStage: TestingStage.SETTING_MESH
+      stage: Stage.SETTING_MESH
     };
 
     this.probes.push(this.firstProbe);
@@ -42,36 +42,36 @@ export class AppComponent {
   }
 
   /**
-   * Valida se o 'TestingStage' informado é igual a 'SETTING_MESH'.
+   * Valida se o 'Stage' informado é igual a 'SETTING_MESH'.
    *
-   * @param testingStage
+   * @param stage
    *
    * @returns boolean
    */
-  public isTestingStageSettingMesh(testingStage: TestingStage): boolean {
-    return this.testingStageService.isTestingStageSettingMesh(testingStage);
+  public isStageSettingMesh(stage: Stage): boolean {
+    return this.stageService.isStageSettingMesh(stage);
   }
 
   /**
-   * Valida se o 'TestingStage' informado é igual a 'SETTING_PROBE'.
+   * Valida se o 'Stage' informado é igual a 'SETTING_PROBE'.
    *
-   * @param testingStage
+   * @param stage
    *
    * @returns boolean
    */
-  public isTestingStageSettingProbe(testingStage: TestingStage): boolean {
-    return this.testingStageService.isTestingStageSettingProbe(testingStage);
+  public isStageSettingProbe(stage: Stage): boolean {
+    return this.stageService.isStageSettingProbe(stage);
   }
 
   /**
-   * Valida se o 'TestingStage' informado é igual a 'CONTROLLING_PROBE'.
+   * Valida se o 'Stage' informado é igual a 'CONTROLLING_PROBE'.
    *
-   * @param testingStage
+   * @param stage
    *
    * @returns boolean
    */
-  public isTestingStageControllingProbe(testingStage: TestingStage): boolean {
-    return this.testingStageService.isTestingStageControllingProbe(testingStage);
+  public isStageControllingProbe(stage: Stage): boolean {
+    return this.stageService.isStageControllingProbe(stage);
   }
 
   /**
@@ -87,7 +87,7 @@ export class AppComponent {
     if (formMesh.valid) {
 
       if (!this.isSquareMatrix(meshConfigurations)) {
-        this.nextStage(meshConfigurations.testingStage);
+        this.nextStage(meshConfigurations.stage);
       } else {
         console.error(MessageService.MSG_ERROR_MESH_MEASURES_EQUALS);
       }
@@ -97,12 +97,12 @@ export class AppComponent {
   /**
    * Avança o estágio da aplicação com base no estágio atual informado.
    *
-   * @param testingStage
+   * @param stage
    *
    * @returns void
    */
-  private nextStage(testingStage: TestingStage): void {
-    this.meshConfigurations.testingStage = this.testingStageService.nextStage(testingStage);
+  private nextStage(stage: Stage): void {
+    this.meshConfigurations.stage = this.stageService.nextStage(stage);
   }
 
   /**

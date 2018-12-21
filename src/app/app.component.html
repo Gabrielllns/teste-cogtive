@@ -4,7 +4,7 @@
     <div class="col-lg-12 col-md-12 mt-4">
       <section class="d-flex justify-content-center">
 
-        <div *ngIf="isTestingStageSettingMesh(meshConfigurations.testingStage)">
+        <div *ngIf="isStageSettingMesh(meshConfigurations.stage)">
           <form class="form-inline" #formMesh="ngForm" (ngSubmit)="initMesh(formMesh, meshConfigurations)" novalidate>
 
             <div class="form-group">
@@ -22,7 +22,7 @@
           </form>
         </div>
 
-        <div *ngIf="isTestingStageSettingProbe(meshConfigurations.testingStage)">
+        <div *ngIf="isStageSettingProbe(meshConfigurations.stage)">
           <form class="form-horizontal text-center" #formProbes="ngForm" (ngSubmit)="initProbes(formProbes, meshConfigurations)"
             novalidate>
 

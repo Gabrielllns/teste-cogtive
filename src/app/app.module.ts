@@ -4,8 +4,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 
+import { StageService } from './service/stage.service';
+import { ActionService } from './service/action.service';
 import { MessageService } from './service/message.service';
-import { TestingStageService } from './service/testing-stage.service';
 
 /**
  * Module responsável pelo compontente 'App'.
@@ -22,8 +23,9 @@ import { TestingStageService } from './service/testing-stage.service';
     ReactiveFormsModule
   ],
   providers: [
+    StageService,
+    ActionService,
     MessageService,
-    TestingStageService
   ],
   bootstrap: [
     AppComponent
