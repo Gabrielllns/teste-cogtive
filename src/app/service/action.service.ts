@@ -7,18 +7,20 @@ import { Injectable } from '@angular/core';
  */
 export class Action {
 
-  public static NORTH: Action = new Action(1, "Norte");
-  public static SOUTH: Action = new Action(2, "Sul");
-  public static EAST: Action = new Action(3, "Leste");
-  public static WEST: Action = new Action(4, "Oeste");
+  public static NORTH: Action = new Action(1, "Norte", "N");
+  public static SOUTH: Action = new Action(2, "Sul", "S");
+  public static EAST: Action = new Action(3, "Leste", "E");
+  public static WEST: Action = new Action(4, "Oeste", "O");
+  public static MOVE: Action = new Action(5, "Movimentar", "M");
 
   /**
    * Construtor da classe.
    *
    * @param id
    * @param description
+   * @param key
    */
-  constructor(public id: number, public description: string) { }
+  constructor(public id: number, public description: string, public key: string) { }
 
   /**
    * Retorna a instância de 'Action' conforme o 'id' informado.
@@ -36,6 +38,31 @@ export class Action {
         return Action.EAST;
       case 4:
         return Action.WEST;
+      case 5:
+        return Action.MOVE;
+      default:
+        return undefined;
+    }
+  }
+
+  /**
+   * Retorna a instância de 'Action' conforme o 'key' informado.
+   *
+   * @param id
+   */
+  public static findByKey(key: string): Action {
+
+    switch (key) {
+      case 'N':
+        return Action.NORTH;
+      case 'S':
+        return Action.SOUTH;
+      case 'E':
+        return Action.EAST;
+      case 'W':
+        return Action.WEST;
+      case 'M':
+        return Action.MOVE;
       default:
         return undefined;
     }
@@ -97,6 +124,17 @@ export class ActionService {
    */
   public isActionWest(action: Action): boolean {
     return action.id === Action.WEST.id;
+  }
+
+  /**
+   * Valida se o 'Action' informado é igual a 'MOVE'.
+   *
+   * @param action
+   *
+   * @returns boolean
+   */
+  public isActionMove(action: Action): boolean {
+    return action.id === Action.MOVE.id;
   }
 
 }
