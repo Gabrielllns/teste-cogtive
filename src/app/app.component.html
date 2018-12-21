@@ -1,0 +1,67 @@
+<div class="container-fluid">
+  <div class="row">
+
+    <div class="col-lg-12 col-md-12 mt-4">
+      <section class="d-flex justify-content-center">
+
+        <div *ngIf="isTestingStageSettingMesh(meshConfigurations.testingStage)">
+          <form class="form-inline" #formMesh="ngForm" (ngSubmit)="initMesh(formMesh, meshConfigurations)" novalidate>
+
+            <div class="form-group">
+              <input type="text" placeholder="Coordenada X" class="form-control" [(ngModel)]="meshConfigurations.inputMeshSizeX"
+                name="inputMeshSizeX" #inputMeshSizeX="ngModel" autocomplete="off" maxlength="3" required>
+
+              <span class="mx-3"> X </span>
+
+              <input type="text" placeholder="Coordenada Y" class="form-control" [(ngModel)]="meshConfigurations.inputMeshSizeY"
+                name="inputMeshSizeY" #inputMeshSizeY="ngModel" autocomplete="off" maxlength="3" required>
+
+              <button type="submit" class="btn btn-info ml-3">Continuar</button>
+            </div>
+
+          </form>
+        </div>
+
+        <div *ngIf="isTestingStageSettingProbe(meshConfigurations.testingStage)">
+          <form class="form-horizontal text-center" #formProbes="ngForm" (ngSubmit)="initProbes(formProbes, meshConfigurations)"
+            novalidate>
+
+            <div class="row">
+              <div *ngFor="let probe of probes; let i = index;">
+                <div class="col-lg-12 col-md-12 my-3">
+                  <h5 class="mr-3">Sonda {{ i + 1 }}:</h5>
+
+                  <input type="text" placeholder="Coordenada X" class="form-control" [(ngModel)]="probe.initialPositionX"
+                    name="initialPositionX" #initialPositionX="ngModel" autocomplete="off" maxlength="3" required>
+
+                  <span class="mx-3"> X </span>
+
+                  <input type="text" placeholder="Coordenada Y" class="form-control" [(ngModel)]="probe.initialPositionY"
+                    name="initialPositionY" #initialPositionY="ngModel" autocomplete="off" maxlength="3" required>
+
+                  <span class="mx-3"> - </span>
+
+                  <select class="form-control" name="initialDirection" #initialDirection="ngModel" [(ngModel)]="probe.initialDirection"
+                    required>
+                    <option value="undefined" selected>Direção Inicial</option>
+                    <option>1</option>
+                    <option>2</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-lg-12">
+                <button type="submit" class="btn btn-info ml-3">Continuar</button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+      </section>
+    </div>
+
+  </div>
+</div>
