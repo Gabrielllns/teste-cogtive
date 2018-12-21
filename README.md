@@ -1,2 +1,2 @@
-# teste_cogtive
+# teste-cogtive
 Teste de programação - Cogtive
