@@ -46,7 +46,7 @@ export class Action {
   }
 
   /**
-   * Retorna a instância de 'Action' conforme o 'key' informado.
+   * Retorna a instância de 'Action' conforme o 'key' informada.
    *
    * @param id
    */
