@@ -6,7 +6,7 @@
 export interface ProbeControl {
   initialPositionX?: number; // Linha
   initialPositionY?: number; // Coluna
-  initialDirection?: string;
+  initialDirection?: number;
   listCommands?: string
   currentPositionX?: number; // Linha
   currentPositionY?: number; // Coluna

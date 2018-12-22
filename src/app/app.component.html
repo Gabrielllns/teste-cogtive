@@ -1,22 +1,21 @@
 <div class="container-fluid">
   <div class="row">
 
-    <div class="col-lg-12 col-md-12 mt-4">
-      <section class="d-flex justify-content-center">
-
+    <div class="col-lg-12 col-md-12 col-xs-12 mt-4">
+      <section class="d-flex justify-content-center" *ngIf="!isStageSimulation(meshConfigurations.stage)">
         <div class="text-center" *ngIf="isStageSettingMesh(meshConfigurations.stage)">
           <h3 class="mb-4">Configurações da Malha</h3>
 
           <form class="form-inline" #formMesh="ngForm" (ngSubmit)="initMesh(formMesh, meshConfigurations)" novalidate>
 
             <div class="form-group">
-              <input type="text" placeholder="Coordenada X" class="form-control" [(ngModel)]="meshConfigurations.inputMeshSizeX"
-                name="inputMeshSizeX" #inputMeshSizeX="ngModel" autocomplete="off" maxlength="3" required>
+              <input type="text" placeholder="Coordenada X" class="form-control" [(ngModel)]="meshConfigurations.finishSizeX"
+                name="finishSizeX" #finishSizeX="ngModel" autocomplete="off" maxlength="3" autofocus required>
 
               <span class="mx-3"> X </span>
 
-              <input type="text" placeholder="Coordenada Y" class="form-control" [(ngModel)]="meshConfigurations.inputMeshSizeY"
-                name="inputMeshSizeY" #inputMeshSizeY="ngModel" autocomplete="off" maxlength="3" required>
+              <input type="text" placeholder="Coordenada Y" class="form-control" [(ngModel)]="meshConfigurations.finishSizeY"
+                name="finishSizeY" #finishSizeY="ngModel" autocomplete="off" maxlength="3" required>
 
               <button type="submit" class="btn btn-info ml-3">Continuar</button>
             </div>
@@ -24,7 +23,7 @@
           </form>
 
           <div class="row mt-3">
-            <div class="col-lg-12">
+            <div class="col-lg-12 col-md-12">
               <small class="text-danger">OBS: As coordenadas X e Y devem ser diferentes!</small>
             </div>
           </div>
@@ -33,16 +32,17 @@
         <div class="text-center" *ngIf="isStageSettingProbe(meshConfigurations.stage)">
           <h3 class="mb-4">Configurações das Sondas</h3>
 
-          <form class="form-horizontal" #formProbes="ngForm" (ngSubmit)="initProbes(formProbes, probesConfigurations)"
+          <form class="form-inline" #formProbes="ngForm" (ngSubmit)="initProbes(formProbes, probesConfigurations)"
             novalidate>
 
             <div class="row">
-              <div *ngFor="let probe of probesConfigurations; let i = index;">
-                <div class="col-lg-12 col-md-12 my-3">
+              <div class="col-lg-12 col-md-12">
+                <div class="my-3" *ngFor="let probe of probesConfigurations; let i = index;">
                   <h5 class="mr-3">Sonda {{ i + 1 }}:</h5>
 
                   <input type="text" placeholder="Coordenada X" class="form-control" [(ngModel)]="probe.initialPositionX"
-                    name="initialPositionX" #initialPositionX="ngModel" autocomplete="off" maxlength="3" required>
+                    name="initialPositionX" #initialPositionX="ngModel" autocomplete="off" maxlength="3" autofocus
+                    required>
 
                   <span class="mx-3"> X </span>
 
@@ -57,11 +57,7 @@
                     <option *ngFor="let direction of directions;" [value]="direction.id">{{ direction.description }}</option>
                   </select>
                 </div>
-              </div>
-            </div>
 
-            <div class="row">
-              <div class="col-lg-12">
                 <button type="submit" class="btn btn-info ml-3">Continuar</button>
               </div>
             </div>
@@ -77,12 +73,12 @@
 
             <div *ngFor="let probe of probesConfigurations; let i = index;">
               <div class="row">
-                <div class="col-lg-12 col-md-12 my-3">
+                <div class="col-lg-12 col-md-12 my-2">
                   <h5 class="mr-3">Sonda {{ i + 1 }}:</h5>
 
                   <input type="text" placeholder="Lista de Comandos" class="form-control" [(ngModel)]="probe.listCommands"
                     name="listCommands_{{ i }}" #listCommands="ngModel" autocomplete="off" (keyup)="processText(probe)"
-                    required>
+                    autofocus required>
 
                   <small class="text-danger">Valores Permitidos: L (Esquerda) / R (Direita) / M (Mover)</small>
 
@@ -91,16 +87,27 @@
             </div>
 
             <div class="row">
-              <div class="col-lg-12">
-
+              <div class="col-lg-12 col-md-12">
                 <button type="submit" class="btn btn-info ml-3 aling-button-vertical">Iniciar Simulação</button>
-
               </div>
             </div>
 
           </form>
         </div>
+      </section>
 
+      <section class="text-center" *ngIf="isStageSimulation(meshConfigurations.stage)">
+        <h3 class="mb-4">Simulação</h3>
+
+        <div *ngFor="let line of meshGroup.lines; let x = index;" class="format-mesh row">
+          <div *ngFor="let column of meshGroup.columns; let y = index;" class="border-mesh flex-position-mesh {{ getStyleMesh(line, column) }}">
+            <p *ngIf="hasProbeInMesh(line, column)">
+              Sonda {{ line.indexProbe + 1 }} - {{ getActionDirectionProbe(probesConfigurations[line.indexProbe].initialDirection) }}
+            </p>
+
+            <span>({{ x }}, {{ y }})</span>
+          </div>
+        </div>
       </section>
     </div>
 

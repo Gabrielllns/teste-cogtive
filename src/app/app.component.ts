@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
@@ -6,6 +7,7 @@ import { MeshConfiguration } from './interface/mesh-configuration-interface';
 
 import { MessageService } from './service/message.service';
 import { StageService, Stage } from './service/stage.service';
+import { MeshService, Situation } from './service/mesh.service';
 import { ActionService, Action } from './service/action.service';
 
 /**
@@ -20,6 +22,7 @@ import { ActionService, Action } from './service/action.service';
 })
 export class AppComponent {
 
+  public meshGroup: any;
   public directions: Action[];
   public firstProbe: ProbeControl = {};
   public secondProbe: ProbeControl = {};
@@ -33,13 +36,14 @@ export class AppComponent {
    * @param actionService
    * @param messageService
    */
-  constructor(private stageService: StageService, private actionService: ActionService, private messageService: MessageService) {
+  constructor(private stageService: StageService, private actionService: ActionService, private messageService: MessageService, private meshService: MeshService) {
+    this.directions = this.actionService.getDirections();
 
     this.meshConfigurations = {
-      stage: Stage.SETTING_MESH
+      initialX: 0,
+      initialY: 0,
+      stage: Stage.SETTING_MESH,
     };
-
-    this.directions = this.actionService.getDirections();
 
     this.probesConfigurations.push(this.firstProbe);
     this.probesConfigurations.push(this.secondProbe);
@@ -79,6 +83,17 @@ export class AppComponent {
   }
 
   /**
+   * Valida se o 'Stage' informado é igual a 'SIMULATION'.
+   *
+   * @param stage
+   *
+   * @returns boolean
+   */
+  public isStageSimulation(stage: Stage): boolean {
+    return this.stageService.isStageSimulation(stage);
+  }
+
+  /**
    * Inicializa as configurações iniciais da 'Malha'.
    *
    * @param formMesh
@@ -91,6 +106,9 @@ export class AppComponent {
     if (formMesh.valid) {
 
       if (!this.isSquareMatrix(meshConfigurations)) {
+        this.meshConfigurations.finishSizeX = Number(this.meshConfigurations.finishSizeX);
+        this.meshConfigurations.finishSizeY = Number(this.meshConfigurations.finishSizeY);
+
         this.nextStage(this.meshConfigurations.stage);
       } else {
         console.error(MessageService.MSG_ERROR_MESH_MEASURES_EQUALS);
@@ -138,8 +156,12 @@ export class AppComponent {
     let isValidPositions = false;
 
     probesConfigurations.forEach((probe, index) => {
-      let isValidPositionX = Number(this.meshConfigurations.inputMeshSizeX) >= Number(probe.initialPositionX);
-      let isValidPositionY = Number(this.meshConfigurations.inputMeshSizeY) >= Number(probe.initialPositionY);
+      let isValidPositionX = Number(this.meshConfigurations.finishSizeX) >= Number(probe.initialPositionX);
+      let isValidPositionY = Number(this.meshConfigurations.finishSizeY) >= Number(probe.initialPositionY);
+
+      probe.initialPositionX = Number(probe.initialPositionX);
+      probe.initialPositionY = Number(probe.initialPositionY);
+      probe.initialDirection = Number(probe.initialDirection);
 
       isValidPositions = (isValidPositionX && isValidPositionY);
 
@@ -147,8 +169,8 @@ export class AppComponent {
         ++countErrors;
 
         parameters.push(Number(index + 1));
-        parameters.push(Number(this.meshConfigurations.inputMeshSizeX));
-        parameters.push(Number(this.meshConfigurations.inputMeshSizeY));
+        parameters.push(Number(this.meshConfigurations.finishSizeX));
+        parameters.push(Number(this.meshConfigurations.finishSizeY));
 
         console.error(this.messageService.setParameters(MessageService.MSG_ERROR_PROBE_COORDINATES_MESH, parameters));
       }
@@ -158,7 +180,7 @@ export class AppComponent {
   }
 
   /**
-   *
+   * Da início ao processamento da simulação.
    *
    * @param formControlProbes
    * @param probesConfigurations
@@ -166,8 +188,41 @@ export class AppComponent {
   public startSimulation(formControlProbes: FormControl, probesConfigurations: ProbeControl[]): void {
 
     if (formControlProbes.valid) {
-      console.log(probesConfigurations);
+      this.meshGroup = this.meshService.generateArrayMesh(this.meshConfigurations);
+
+      this.nextStage(this.meshConfigurations.stage);
+
+      this.setProbesInMesh(this.meshGroup, probesConfigurations).subscribe(() => {
+        console.log(probesConfigurations);
+        console.log(this.meshGroup);
+      });
     }
+  }
+
+  /**
+   * Seta as posições das 'Sondas' na 'Malha'.
+   *
+   * @param meshGroup
+   * @param probesConfigurations
+   */
+  public setProbesInMesh(meshGroup: any, probesConfigurations: ProbeControl[]): Observable<void> {
+
+    return new Observable(observer => {
+
+      probesConfigurations.forEach((probe, index) => {
+        meshGroup.lines[probe.initialPositionX].hasProbe = true;
+        meshGroup.lines[probe.initialPositionX].indexProbe = index;
+
+        meshGroup.columns[probe.initialPositionY].hasProbe = true;
+        meshGroup.columns[probe.initialPositionY].indexProbe = index;
+        meshGroup.columns[probe.initialPositionY].situation = Situation.HAS_PROBE;
+
+        if (index === (probesConfigurations.length - 1)) {
+          observer.next();
+          observer.complete();
+        }
+      });
+    });
   }
 
   /**
@@ -178,7 +233,7 @@ export class AppComponent {
    * @returns boolean
    */
   private isSquareMatrix(meshConfigurations: MeshConfiguration): boolean {
-    return Number(meshConfigurations.inputMeshSizeX) === Number(meshConfigurations.inputMeshSizeY);
+    return Number(meshConfigurations.finishSizeX) === Number(meshConfigurations.finishSizeY);
   }
 
   /**
@@ -189,6 +244,35 @@ export class AppComponent {
   public processText(probe: ProbeControl): void {
     probe.listCommands = probe.listCommands.replace(/\d/g, ""); // Remove o que não for letra.
     probe.listCommands = probe.listCommands.toUpperCase(); // Coloca os termos em caixa alta.
+  }
+
+  /**
+   * Retorna o estilo conforme a linha e a coluna informada.
+   *
+   * @param line
+   * @param column
+   */
+  public getStyleMesh(line: any, column: any): string {
+    return (line.hasProbe && column.hasProbe && line.indexProbe === column.indexProbe) ? 'bg-info' : 'bg-danger';
+  }
+
+  /**
+   * Valida se existe 'Sonda' na posição da 'Malha' informada.
+   *
+   * @param line
+   * @param column
+   */
+  public hasProbeInMesh(line: any, column: any): boolean {
+    return line.indexProbe !== undefined && column.indexProbe !== undefined && line.indexProbe === column.indexProbe;
+  }
+
+  /**
+   * Retorna a descrição da direção conforme os parâmetros informados.
+   *
+   * @param initialDirection
+   */
+  public getActionDirectionProbe(initialDirection: number): string {
+    return Action.findById(initialDirection).description;
   }
 
 }

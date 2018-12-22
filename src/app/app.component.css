@@ -1,3 +1,17 @@
 .aling-button-vertical {
   margin-top: 2.0rem !important;
 }
+
+.border-mesh {
+  border: 1px solid #000;
+}
+
+.format-mesh {
+  height: 50%;
+  justify-content: center;
+}
+
+.flex-position-mesh {
+  width: 10%;
+  padding: 1%;
+}

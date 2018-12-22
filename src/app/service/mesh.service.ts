@@ -1,0 +1,91 @@
+import { Injectable } from '@angular/core';
+
+import { MeshConfiguration } from '../interface/mesh-configuration-interface';
+
+/**
+ * Classe de mapeamento com as possíves representações de 'Situation'.
+ *
+ * @author Gabriel Neres
+ */
+export class Situation {
+
+  public static HASNT_PROBE: Situation = new Situation(1, "Sem Sonda", "bg-danger");
+  public static HAS_PROBE: Situation = new Situation(2, "Com Sonda", "bg-danger");
+
+  /**
+   * Construtor da classe.
+   *
+   * @param id
+   * @param description
+   * @param style
+   */
+  constructor(public id: number, public description: string, public style: string) { }
+
+  /**
+   * Retorna a instância de 'Situation' conforme o 'id' informado.
+   *
+   * @param id
+   */
+  public static findById(id: number): Situation {
+
+    switch (id) {
+      case 1:
+        return Situation.HASNT_PROBE;
+      case 2:
+        return Situation.HAS_PROBE;
+      default:
+        return undefined;
+    }
+  }
+}
+
+/**
+ * Classe de service para controle do 'Mesh'.
+ *
+ * @author Gabriel Neres
+ */
+@Injectable()
+export class MeshService {
+
+  /**
+   * Construtor do service.
+   */
+  constructor() { }
+
+  /**
+   * Gera o array de índices da malha conforme os parâmetros
+   *
+   * @param meshConfigurations
+   */
+  public generateArrayMesh(meshConfigurations: MeshConfiguration): any {
+    let meshGroup = {
+      'lines': [],
+      'columns': []
+    };
+
+    for (let x = meshConfigurations.initialX; x <= meshConfigurations.finishSizeX; x++) {
+      meshGroup.lines.push(this.getItem(Situation.HASNT_PROBE));
+    }
+
+    for (let y = meshConfigurations.initialY; y <= meshConfigurations.finishSizeY; y++) {
+      meshGroup.columns.push(this.getItem(Situation.HASNT_PROBE));
+    }
+
+    return meshGroup;
+  }
+
+  /**
+   * Retorna um novo objeto com ad configurações de linha/coluna.
+   *
+   * @param situation
+   */
+  private getItem(situation: Situation): any {
+
+    return {
+      'situation': situation,
+      'hasProbe': false,
+      'indexProbe': undefined
+    };
+  }
+
+}

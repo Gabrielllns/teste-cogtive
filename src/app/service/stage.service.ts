@@ -9,7 +9,8 @@ export class Stage {
 
   public static SETTING_MESH: Stage = new Stage(1, "Configurando a Malha", 2);
   public static SETTING_PROBE: Stage = new Stage(2, "Configurando as Sondas", 3);
-  public static CONTROLLING_PROBE: Stage = new Stage(3, "Controlando as Sondas", 3);
+  public static CONTROLLING_PROBE: Stage = new Stage(3, "Controlando as Sondas", 4);
+  public static SIMULATION: Stage = new Stage(4, "Simulação", 4);
 
   /**
    * Construtor da classe.
@@ -34,6 +35,8 @@ export class Stage {
         return Stage.SETTING_PROBE;
       case 3:
         return Stage.CONTROLLING_PROBE;
+      case 4:
+        return Stage.SIMULATION;
       default:
         return undefined;
     }
@@ -84,6 +87,16 @@ export class StageService {
    */
   public isStageControllingProbe(stage: Stage): boolean {
     return stage.id === Stage.CONTROLLING_PROBE.id;
+  }
+  /**
+   * Valida se o 'Stage' informado é igual a 'SIMULATION'.
+   *
+   * @param stage
+   *
+   * @returns boolean
+   */
+  public isStageSimulation(stage: Stage): boolean {
+    return stage.id === Stage.SIMULATION.id;
   }
 
   /**
