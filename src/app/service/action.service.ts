@@ -137,4 +137,20 @@ export class ActionService {
     return action.id === Action.MOVE.id;
   }
 
+  /**
+   * Retorna as direções possíveis para a 'Sonda'.
+   *
+   * @returns Action[]
+   */
+  public getDirections(): Action[] {
+    let directions: Action[] = [];
+
+    directions.push(Action.NORTH);
+    directions.push(Action.SOUTH);
+    directions.push(Action.EAST);
+    directions.push(Action.WEST);
+
+    return directions;
+  }
+
 }
