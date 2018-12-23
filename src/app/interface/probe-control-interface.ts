@@ -1,3 +1,5 @@
+import { Action } from "../service/action.service";
+
 /**
  * Interface responsável pala variável de controle das 'Sondas'.
  *
@@ -10,5 +12,5 @@ export interface ProbeControl {
   listCommands?: string
   currentPositionX?: number; // Linha
   currentPositionY?: number; // Coluna
-  currentDirection?: string;
+  currentDirection?: number;
 }

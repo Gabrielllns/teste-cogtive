@@ -54,7 +54,9 @@
                   <select class="form-control" name="initialDirection" #initialDirection="ngModel" [(ngModel)]="probe.initialDirection"
                     required>
                     <option value="undefined" selected>Informe a direção inicial</option>
-                    <option *ngFor="let direction of directions;" [value]="direction.id">{{ direction.description }}</option>
+                    <option *ngFor="let direction of directions;" [value]="direction.id">
+                      {{ direction.description }} - ({{ direction.key }})
+                    </option>
                   </select>
                 </div>
 
@@ -70,6 +72,8 @@
 
           <form class="form-horizontal" #formControlProbes="ngForm" (ngSubmit)="startSimulation(formControlProbes, probesConfigurations)"
             novalidate>
+
+            <span>LMLMLMLMM - MMRMMRMRRM</span>
 
             <div *ngFor="let probe of probesConfigurations; let i = index;">
               <div class="row">
@@ -102,7 +106,8 @@
         <div *ngFor="let line of meshGroup.lines; let x = index;" class="format-mesh row">
           <div *ngFor="let column of meshGroup.columns; let y = index;" class="border-mesh flex-position-mesh {{ getStyleMesh(line, column) }}">
             <p *ngIf="hasProbeInMesh(line, column)">
-              Sonda {{ line.indexProbe + 1 }} - {{ getActionDirectionProbe(probesConfigurations[line.indexProbe].initialDirection) }}
+              Sonda {{ line.indexProbe + 1 }}
+              - ({{ getActionDirectionProbe(probesConfigurations[line.indexProbe].initialDirection) }})
             </p>
 
             <span>({{ x }}, {{ y }})</span>

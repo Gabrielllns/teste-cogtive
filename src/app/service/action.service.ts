@@ -7,11 +7,13 @@ import { Injectable } from '@angular/core';
  */
 export class Action {
 
-  public static NORTH: Action = new Action(1, "Norte", "N");
-  public static SOUTH: Action = new Action(2, "Sul", "S");
-  public static EAST: Action = new Action(3, "Leste", "E");
-  public static WEST: Action = new Action(4, "Oeste", "O");
-  public static MOVE: Action = new Action(5, "Movimentar", "M");
+  public static NORTH: Action = new Action(1, "Norte", "N", "▲");
+  public static SOUTH: Action = new Action(2, "Sul", "S", "▼");
+  public static EAST: Action = new Action(3, "Leste", "E", "►");
+  public static WEST: Action = new Action(4, "Oeste", "W", "◄");
+  public static MOVE: Action = new Action(5, "Movimentar", "M", null);
+  public static RIGHT: Action = new Action(6, "Direita", "R", null);
+  public static LEFT: Action = new Action(7, "Esquerda", "L", null);
 
   /**
    * Construtor da classe.
@@ -20,7 +22,7 @@ export class Action {
    * @param description
    * @param key
    */
-  constructor(public id: number, public description: string, public key: string) { }
+  constructor(public id: number, public description: string, public key: string, public icon: string) { }
 
   /**
    * Retorna a instância de 'Action' conforme o 'id' informado.
@@ -40,6 +42,10 @@ export class Action {
         return Action.WEST;
       case 5:
         return Action.MOVE;
+      case 6:
+        return Action.RIGHT;
+      case 7:
+        return Action.LEFT;
       default:
         return undefined;
     }
@@ -63,6 +69,10 @@ export class Action {
         return Action.WEST;
       case 'M':
         return Action.MOVE;
+      case 'R':
+        return Action.RIGHT;
+      case 'L':
+        return Action.LEFT;
       default:
         return undefined;
     }

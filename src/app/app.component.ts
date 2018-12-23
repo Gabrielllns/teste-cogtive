@@ -5,6 +5,7 @@ import { FormControl } from '@angular/forms';
 import { ProbeControl } from './interface/probe-control-interface';
 import { MeshConfiguration } from './interface/mesh-configuration-interface';
 
+import { ProbeService } from './service/probe.service';
 import { MessageService } from './service/message.service';
 import { StageService, Stage } from './service/stage.service';
 import { MeshService, Situation } from './service/mesh.service';
@@ -32,11 +33,12 @@ export class AppComponent {
   /**
    * Construtor do componente.
    *
+   * @param probeService
    * @param stageService
    * @param actionService
    * @param messageService
    */
-  constructor(private stageService: StageService, private actionService: ActionService, private messageService: MessageService, private meshService: MeshService) {
+  constructor(private probeService: ProbeService, private stageService: StageService, private actionService: ActionService, private messageService: MessageService, private meshService: MeshService) {
     this.directions = this.actionService.getDirections();
 
     this.meshConfigurations = {
@@ -105,14 +107,14 @@ export class AppComponent {
 
     if (formMesh.valid) {
 
-      if (!this.isSquareMatrix(meshConfigurations)) {
-        this.meshConfigurations.finishSizeX = Number(this.meshConfigurations.finishSizeX);
-        this.meshConfigurations.finishSizeY = Number(this.meshConfigurations.finishSizeY);
+      //if (!this.isSquareMatrix(meshConfigurations)) {
+      this.meshConfigurations.finishSizeX = Number(this.meshConfigurations.finishSizeX);
+      this.meshConfigurations.finishSizeY = Number(this.meshConfigurations.finishSizeY);
 
-        this.nextStage(this.meshConfigurations.stage);
-      } else {
-        console.error(MessageService.MSG_ERROR_MESH_MEASURES_EQUALS);
-      }
+      this.nextStage(this.meshConfigurations.stage);
+      // } else {
+      //   console.error(MessageService.MSG_ERROR_MESH_MEASURES_EQUALS);
+      // }
     }
   }
 
@@ -163,6 +165,10 @@ export class AppComponent {
       probe.initialPositionY = Number(probe.initialPositionY);
       probe.initialDirection = Number(probe.initialDirection);
 
+      probe.currentPositionX = probe.initialPositionX;
+      probe.currentPositionY = probe.initialPositionY;
+      probe.currentDirection = probe.initialDirection;
+
       isValidPositions = (isValidPositionX && isValidPositionY);
 
       if (!isValidPositions) {
@@ -193,10 +199,53 @@ export class AppComponent {
       this.nextStage(this.meshConfigurations.stage);
 
       this.setProbesInMesh(this.meshGroup, probesConfigurations).subscribe(() => {
-        console.log(probesConfigurations);
-        console.log(this.meshGroup);
+        this.simulate(probesConfigurations);
       });
     }
+  }
+
+  /**
+   * Simula as novas ações de cada uma das 'Sondas'.
+   *
+   * @param probesConfigurations
+   */
+  private simulate(probesConfigurations: ProbeControl[]): void {
+    let moves = this.probeService.getMoves(); // Recupera a lista de movimentos possíveis.
+
+    probesConfigurations.forEach((probe, index) => {
+      let listCommands = probe.listCommands; // Recupera a lista de comandos.
+
+      for (let i = 0; i < listCommands.length; i++) { // Lê cada um dos caracteres.
+
+        Object.keys(moves).forEach(moveKey => { // Percorre os sentidos dos movimentos.
+          let comand = listCommands.charAt(i);
+
+          if (moveKey === comand) { // Compara as KEYS.
+            let movesDirection = moves[moveKey]; // Movimentos possíveis.
+            let newDirection = Action.findByKey(moveKey); // Retorna a nova direção sugerida.
+            let currentDirectionTO = Action.findById(probe.currentDirection); // Direção atual.
+
+            Object.keys(movesDirection).forEach(directionKey => {  // Percorre a posição atual da 'sonda'.
+
+              if (currentDirectionTO.key === directionKey) { // Compara as direções.
+                let moveDirectionTO = movesDirection[directionKey];
+
+                if (this.actionService.isActionMove(newDirection)) {
+                  probe.currentPositionX += moveDirectionTO.line;
+                  probe.currentPositionY += moveDirectionTO.column;
+                } else {
+                  probe.currentDirection = moveDirectionTO.newDirection;
+                }
+              }
+            });
+          }
+        });
+      }
+
+      if (index === (probesConfigurations.length - 1)) {
+        console.log(probesConfigurations);
+      }
+    });
   }
 
   /**
@@ -205,7 +254,7 @@ export class AppComponent {
    * @param meshGroup
    * @param probesConfigurations
    */
-  public setProbesInMesh(meshGroup: any, probesConfigurations: ProbeControl[]): Observable<void> {
+  private setProbesInMesh(meshGroup: any, probesConfigurations: ProbeControl[]): Observable<void> {
 
     return new Observable(observer => {
 
@@ -243,7 +292,7 @@ export class AppComponent {
    */
   public processText(probe: ProbeControl): void {
     probe.listCommands = probe.listCommands.replace(/\d/g, ""); // Remove o que não for letra.
-    probe.listCommands = probe.listCommands.toUpperCase(); // Coloca os termos em caixa alta.
+    probe.listCommands = probe.listCommands.toUpperCase().trim(); // Coloca os termos em caixa alta e remove os espaços.
   }
 
   /**
@@ -272,7 +321,7 @@ export class AppComponent {
    * @param initialDirection
    */
   public getActionDirectionProbe(initialDirection: number): string {
-    return Action.findById(initialDirection).description;
+    return Action.findById(initialDirection).key;
   }
 
 }
