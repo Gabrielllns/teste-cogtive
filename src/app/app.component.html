@@ -11,12 +11,20 @@
 
             <div class="form-group">
               <input type="text" placeholder="Coordenada X" class="form-control" [(ngModel)]="meshConfigurations.finishSizeX"
-                name="finishSizeX" #finishSizeX="ngModel" autocomplete="off" maxlength="3" autofocus required>
+                name="finishSizeX" #finishSizeX="ngModel" autocomplete="off" (keyup)="getOnlyNumbersMesh(meshConfigurations)"
+                maxlength="3" autofocus required>
 
               <span class="mx-3"> X </span>
 
               <input type="text" placeholder="Coordenada Y" class="form-control" [(ngModel)]="meshConfigurations.finishSizeY"
-                name="finishSizeY" #finishSizeY="ngModel" autocomplete="off" maxlength="3" required>
+                name="finishSizeY" #finishSizeY="ngModel" autocomplete="off" (keyup)="getOnlyNumbersMesh(meshConfigurations)"
+                maxlength="3" required>
+
+              <div class="ml-3">
+                <label>Desabilitar verificação de matriz quadrada</label>
+                <input type="checkbox" [value]="true" class="form-control" [(ngModel)]="meshConfigurations.isDisabledRoleSquareMatrix"
+                  name="isDisabledRoleSquareMatrix" #isDisabledRoleSquareMatrix="ngModel">
+              </div>
 
               <button type="submit" class="btn btn-info ml-3">Continuar</button>
             </div>
@@ -74,6 +82,8 @@
           <form class="form-horizontal" #formControlProbes="ngForm" (ngSubmit)="startSimulation(formControlProbes, probesConfigurations)"
             novalidate>
 
+            <span>LMLMLMLMM - MMRMMRMRRM</span>
+
             <div *ngFor="let probe of probesConfigurations; let i = index;">
               <div class="row">
                 <div class="col-lg-12 col-md-12 my-2">
@@ -118,14 +128,20 @@
           <div class="col-md-6">
             <h5>Sonda 1</h5>
             <ul>
-              <li *ngFor="let history of historyFisrtProbe;">({{ history }})</li>
+              <li *ngFor="let history of historyFisrtProbe; let x = index;">
+                <span *ngIf="!hasLastIndex(historyFisrtProbe.length, x)">({{ history }})</span>
+                <b *ngIf="hasLastIndex(historyFisrtProbe.length, x)" class="text-success">({{ history }})</b>
+              </li>
             </ul>
           </div>
 
           <div class="col-md-6">
             <h5>Sonda 2</h5>
             <ul>
-              <li *ngFor="let history of historySecondProbe;">({{ history }})</li>
+              <li *ngFor="let history of historySecondProbe; let y = index;">
+                <span *ngIf="!hasLastIndex(historySecondProbe.length, y)">({{ history }})</span>
+                <b *ngIf="hasLastIndex(historySecondProbe.length, y)" class="text-success">({{ history }})</b>
+              </li>
             </ul>
           </div>
         </div>

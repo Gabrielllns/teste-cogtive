@@ -28,6 +28,8 @@ export class Action {
    * Retorna a instância de 'Action' conforme o 'id' informado.
    *
    * @param id
+   *
+   * @returns Action
    */
   public static findById(id: number): Action {
 
@@ -55,6 +57,8 @@ export class Action {
    * Retorna a instância de 'Action' conforme o 'key' informada.
    *
    * @param id
+   *
+   * @returns Action
    */
   public static findByKey(key: string): Action {
 

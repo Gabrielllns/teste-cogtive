@@ -25,6 +25,8 @@ export class Situation {
    * Retorna a instância de 'Situation' conforme o 'id' informado.
    *
    * @param id
+   *
+   * @returns Situation
    */
   public static findById(id: number): Situation {
 
@@ -56,6 +58,8 @@ export class MeshService {
    * Gera o array de índices da malha conforme os parâmetros
    *
    * @param meshConfigurations
+   *
+   * @returns any
    */
   public generateArrayMesh(meshConfigurations: MeshConfiguration): any {
     let meshGroup = {
@@ -80,6 +84,8 @@ export class MeshService {
    * @param situation
    * @param x
    * @param y
+   *
+   * @returns any
    */
   private getItem(situation: Situation, x: number, y: number): any {
 

@@ -25,6 +25,8 @@ export class Stage {
    * Retorna a instância de 'Stage' conforme o 'id' informado.
    *
    * @param id
+   *
+   * @returns Stage
    */
   public static findById(id: number): Stage {
 

@@ -17,6 +17,8 @@ export class ProbeService {
 
   /**
    * Retorna o array de possíveis movimentos e suas configurações.
+   *
+   * @returns any
    */
   public getMoves(): any {
 

@@ -11,4 +11,5 @@ export interface MeshConfiguration {
   initialY: number; // Coluna
   finishSizeX?: number; // Linha
   finishSizeY?: number; // Coluna
+  isDisabledRoleSquareMatrix?: boolean;
 }

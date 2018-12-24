@@ -47,6 +47,7 @@ export class AppComponent {
       initialX: 0,
       initialY: 0,
       stage: Stage.SETTING_MESH,
+      isDisabledRoleSquareMatrix: false
     };
 
     this.probesConfigurations.push(this.firstProbe);
@@ -109,7 +110,7 @@ export class AppComponent {
 
     if (formMesh.valid) {
 
-      if (!this.isSquareMatrix(meshConfigurations)) {
+      if (meshConfigurations.isDisabledRoleSquareMatrix || !this.isSquareMatrix(meshConfigurations)) {
         this.meshConfigurations.finishSizeX = Number(this.meshConfigurations.finishSizeX);
         this.meshConfigurations.finishSizeY = Number(this.meshConfigurations.finishSizeY);
 
@@ -117,6 +118,8 @@ export class AppComponent {
       } else {
         console.error(MessageService.MSG_ERROR_MESH_MEASURES_EQUALS);
       }
+    } else {
+      console.error(MessageService.MSG_ERROR_FORM_NOT_VALID);
     }
   }
 
@@ -146,6 +149,8 @@ export class AppComponent {
       if (this.isValidPositions(probesConfigurations)) {
         this.nextStage(this.meshConfigurations.stage);
       }
+    } else {
+      console.error(MessageService.MSG_ERROR_FORM_NOT_VALID);
     }
   }
 
@@ -153,6 +158,8 @@ export class AppComponent {
    * Valida se as posições iniciais definidas para cada uma das sondas se encontram dentro dos limites definidos para a 'Malha'.
    *
    * @param probesConfigurations
+   *
+   * @returns boolean
    */
   private isValidPositions(probesConfigurations: ProbeControl[]): boolean {
     let countErrors = 0;
@@ -189,6 +196,8 @@ export class AppComponent {
    *
    * @param formControlProbes
    * @param probesConfigurations
+   *
+   * @returns void
    */
   public startSimulation(formControlProbes: FormControl, probesConfigurations: ProbeControl[]): void {
 
@@ -200,6 +209,8 @@ export class AppComponent {
       this.setProbesInMesh(this.meshGroup, probesConfigurations).subscribe(() => {
         this.simulate(probesConfigurations);
       });
+    } else {
+      console.error(MessageService.MSG_ERROR_FORM_NOT_VALID);
     }
   }
 
@@ -207,6 +218,8 @@ export class AppComponent {
    * Simula as novas ações de cada uma das 'Sondas'.
    *
    * @param probesConfigurations
+   *
+   * @returns void
    */
   private simulate(probesConfigurations: ProbeControl[]): void {
     let moves = this.probeService.getMoves(); // Recupera a lista de movimentos possíveis.
@@ -250,6 +263,8 @@ export class AppComponent {
    *
    * @param probe
    * @param newDirection
+   *
+   * @returns void
    */
   private setNewHistoryComand(probe: ProbeControl, newDirection: Action): void {
     let history = probe.currentPositionX + ' - ' + probe.currentPositionY + ' - ' + Action.findById(probe.currentDirection).key + ' -> ' + newDirection.key;
@@ -261,6 +276,8 @@ export class AppComponent {
    *
    * @param meshGroup
    * @param probesConfigurations
+   *
+   * @returns Observable<void>
    */
   private setProbesInMesh(meshGroup: any, probesConfigurations: ProbeControl[]): Observable<void> {
 
@@ -276,7 +293,7 @@ export class AppComponent {
         meshGroup.columns[probe.initialPositionY].indexProbe = index;
         meshGroup.columns[probe.initialPositionY].situation = Situation.HAS_PROBE;
 
-        if (index === (probesConfigurations.length - 1)) {
+        if (this.hasLastIndex(probesConfigurations.length, index)) {
           observer.next();
           observer.complete();
         }
@@ -299,6 +316,8 @@ export class AppComponent {
    * Processa o 'valor' informado colocando-o no padrão definido (apenas string e em caixa alta).
    *
    * @param probe
+   *
+   * @returns void
    */
   public processText(probe: ProbeControl): void {
     probe.listCommands = probe.listCommands.replace(/\d/g, ""); // Remove o que não for letra.
@@ -306,10 +325,24 @@ export class AppComponent {
   }
 
   /**
+   * Processa o 'valor' informado colocando-o no padrão definido (apenas números).
+   *
+   * @param meshConfigurations
+   *
+   * @returns void
+   */
+  public getOnlyNumbersMesh(meshConfigurations: MeshConfiguration): void {
+    meshConfigurations.finishSizeX = Number(String(meshConfigurations.finishSizeX).replace(/\D/g, "")); // Remove o que for letra.
+    meshConfigurations.finishSizeY = Number(String(meshConfigurations.finishSizeY).replace(/\D/g, "")); // Remove o que for letra.
+  }
+
+  /**
    * Retorna o estilo conforme a linha e a coluna informada.
    *
    * @param line
    * @param column
+   *
+   * @returns string
    */
   public getStyleMesh(line: any, column: any): string {
     return (line.hasProbe && column.hasProbe && line.indexProbe === column.indexProbe) ? 'bg-info' : 'bg-danger';
@@ -320,6 +353,8 @@ export class AppComponent {
    *
    * @param line
    * @param column
+   *
+   * @returns boolean
    */
   public hasProbeInMesh(line: any, column: any): boolean {
     return line.indexProbe !== undefined && column.indexProbe !== undefined && line.indexProbe === column.indexProbe;
@@ -329,9 +364,21 @@ export class AppComponent {
    * Retorna a descrição da direção conforme os parâmetros informados.
    *
    * @param initialDirection
+   *
+   * @returns string
    */
   public getActionDirectionProbe(initialDirection: number): string {
     return Action.findById(initialDirection).key;
+  }
+
+  /**
+   *Verifica se está na última posição do array.
+   *
+   * @param length
+   * @param currentIndex
+   */
+  public hasLastIndex(length: number, currentIndex: number): boolean {
+    return ((length - 1) === currentIndex);
   }
 
 }
