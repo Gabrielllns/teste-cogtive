@@ -13,5 +13,9 @@
 
 .flex-position-mesh {
   width: 10%;
-  padding: 1%;
+  padding: 0.5%;
+}
+
+li {
+  list-style: none;
 }

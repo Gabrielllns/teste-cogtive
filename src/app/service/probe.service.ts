@@ -51,20 +51,20 @@ export class ProbeService {
       },
       'M': {
         'N': {
-          'line': -1,
-          'column': 0
-        },
-        'S': {
-          'line': 1,
-          'column': 0
-        },
-        'E': {
           'line': 0,
           'column': 1
         },
-        'W': {
+        'S': {
           'line': 0,
           'column': -1
+        },
+        'E': {
+          'line': 1,
+          'column': 0
+        },
+        'W': {
+          'line': -1,
+          'column': 0
         },
       }
     };

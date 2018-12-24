@@ -6,6 +6,7 @@ import { Action } from "../service/action.service";
  * @author Gabriel Neres
  */
 export interface ProbeControl {
+  id?: number;
   initialPositionX?: number; // Linha
   initialPositionY?: number; // Coluna
   initialDirection?: number;

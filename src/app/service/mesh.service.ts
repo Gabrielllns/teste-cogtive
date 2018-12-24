@@ -63,12 +63,12 @@ export class MeshService {
       'columns': []
     };
 
-    for (let x = meshConfigurations.initialX; x <= meshConfigurations.finishSizeX; x++) {
-      meshGroup.lines.push(this.getItem(Situation.HASNT_PROBE));
+    for (let x = meshConfigurations.finishSizeX; x >= meshConfigurations.initialX; x--) {
+      meshGroup.lines.push(this.getItem(Situation.HASNT_PROBE, x, undefined));
     }
 
     for (let y = meshConfigurations.initialY; y <= meshConfigurations.finishSizeY; y++) {
-      meshGroup.columns.push(this.getItem(Situation.HASNT_PROBE));
+      meshGroup.columns.push(this.getItem(Situation.HASNT_PROBE, undefined, y));
     }
 
     return meshGroup;
@@ -78,13 +78,17 @@ export class MeshService {
    * Retorna um novo objeto com ad configurações de linha/coluna.
    *
    * @param situation
+   * @param x
+   * @param y
    */
-  private getItem(situation: Situation): any {
+  private getItem(situation: Situation, x: number, y: number): any {
 
     return {
       'situation': situation,
       'hasProbe': false,
-      'indexProbe': undefined
+      'indexProbe': undefined,
+      'x': x,
+      'y': y
     };
   }
 

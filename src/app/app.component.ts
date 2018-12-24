@@ -25,10 +25,12 @@ export class AppComponent {
 
   public meshGroup: any;
   public directions: Action[];
-  public firstProbe: ProbeControl = {};
-  public secondProbe: ProbeControl = {};
+  public historyFisrtProbe: any[] = [];
+  public historySecondProbe: any[] = [];
   public probesConfigurations: any[] = [];
   public meshConfigurations: MeshConfiguration;
+  public firstProbe: ProbeControl = { 'id': 1 };
+  public secondProbe: ProbeControl = { 'id': 2 };
 
   /**
    * Construtor do componente.
@@ -107,14 +109,14 @@ export class AppComponent {
 
     if (formMesh.valid) {
 
-      //if (!this.isSquareMatrix(meshConfigurations)) {
-      this.meshConfigurations.finishSizeX = Number(this.meshConfigurations.finishSizeX);
-      this.meshConfigurations.finishSizeY = Number(this.meshConfigurations.finishSizeY);
+      if (!this.isSquareMatrix(meshConfigurations)) {
+        this.meshConfigurations.finishSizeX = Number(this.meshConfigurations.finishSizeX);
+        this.meshConfigurations.finishSizeY = Number(this.meshConfigurations.finishSizeY);
 
-      this.nextStage(this.meshConfigurations.stage);
-      // } else {
-      //   console.error(MessageService.MSG_ERROR_MESH_MEASURES_EQUALS);
-      // }
+        this.nextStage(this.meshConfigurations.stage);
+      } else {
+        console.error(MessageService.MSG_ERROR_MESH_MEASURES_EQUALS);
+      }
     }
   }
 
@@ -155,7 +157,6 @@ export class AppComponent {
   private isValidPositions(probesConfigurations: ProbeControl[]): boolean {
     let countErrors = 0;
     let parameters = [];
-    let isValidPositions = false;
 
     probesConfigurations.forEach((probe, index) => {
       let isValidPositionX = Number(this.meshConfigurations.finishSizeX) >= Number(probe.initialPositionX);
@@ -169,9 +170,7 @@ export class AppComponent {
       probe.currentPositionY = probe.initialPositionY;
       probe.currentDirection = probe.initialDirection;
 
-      isValidPositions = (isValidPositionX && isValidPositionY);
-
-      if (!isValidPositions) {
+      if (!(isValidPositionX && isValidPositionY)) {
         ++countErrors;
 
         parameters.push(Number(index + 1));
@@ -212,10 +211,10 @@ export class AppComponent {
   private simulate(probesConfigurations: ProbeControl[]): void {
     let moves = this.probeService.getMoves(); // Recupera a lista de movimentos possíveis.
 
-    probesConfigurations.forEach((probe, index) => {
+    probesConfigurations.forEach((probe) => {
       let listCommands = probe.listCommands; // Recupera a lista de comandos.
 
-      for (let i = 0; i < listCommands.length; i++) { // Lê cada um dos caracteres.
+      for (let i = 0; i <= listCommands.length; i++) { // Lê cada um dos caracteres.
 
         Object.keys(moves).forEach(moveKey => { // Percorre os sentidos dos movimentos.
           let comand = listCommands.charAt(i);
@@ -236,16 +235,25 @@ export class AppComponent {
                 } else {
                   probe.currentDirection = moveDirectionTO.newDirection;
                 }
+
+                this.setNewHistoryComand(probe, newDirection);
               }
             });
           }
         });
       }
-
-      if (index === (probesConfigurations.length - 1)) {
-        console.log(probesConfigurations);
-      }
     });
+  }
+
+  /**
+   * Seta um novo item no histórico.
+   *
+   * @param probe
+   * @param newDirection
+   */
+  private setNewHistoryComand(probe: ProbeControl, newDirection: Action): void {
+    let history = probe.currentPositionX + ' - ' + probe.currentPositionY + ' - ' + Action.findById(probe.currentDirection).key + ' -> ' + newDirection.key;
+    (probe.id === 1) ? this.historyFisrtProbe.push(history) : this.historySecondProbe.push(history);
   }
 
   /**
@@ -259,8 +267,10 @@ export class AppComponent {
     return new Observable(observer => {
 
       probesConfigurations.forEach((probe, index) => {
-        meshGroup.lines[probe.initialPositionX].hasProbe = true;
-        meshGroup.lines[probe.initialPositionX].indexProbe = index;
+        let indexLine = ((meshGroup.lines.length - 1) - probe.initialPositionX);
+
+        meshGroup.lines[indexLine].hasProbe = true;
+        meshGroup.lines[indexLine].indexProbe = index;
 
         meshGroup.columns[probe.initialPositionY].hasProbe = true;
         meshGroup.columns[probe.initialPositionY].indexProbe = index;
