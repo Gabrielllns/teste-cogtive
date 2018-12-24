@@ -6,16 +6,28 @@
   border: 1px solid #000;
 }
 
+.bg-sucess {
+  background-color: #00FF7F;
+}
+
+.bg-danger {
+  background-color: #E3606D !important;
+}
+
 .format-mesh {
   height: 50%;
   justify-content: center;
 }
 
 .flex-position-mesh {
-  width: 10%;
+  width: 8%;
   padding: 0.5%;
 }
 
 li {
   list-style: none;
+}
+
+p.no-mb {
+  margin-bottom: 0 !important;
 }

@@ -24,6 +24,7 @@ import { ActionService, Action } from './service/action.service';
 export class AppComponent {
 
   public meshGroup: any;
+  public meshGroupTO: any;
   public directions: Action[];
   public historyFisrtProbe: any[] = [];
   public historySecondProbe: any[] = [];
@@ -203,10 +204,11 @@ export class AppComponent {
 
     if (formControlProbes.valid) {
       this.meshGroup = this.meshService.generateArrayMesh(this.meshConfigurations);
+      this.meshGroupTO = this.meshService.generateArrayMesh(this.meshConfigurations);
 
       this.nextStage(this.meshConfigurations.stage);
 
-      this.setProbesInMesh(this.meshGroup, probesConfigurations).subscribe(() => {
+      this.setProbesInMesh(this.meshGroup, probesConfigurations, true).subscribe(() => {
         this.simulate(probesConfigurations);
       });
     } else {
@@ -224,7 +226,7 @@ export class AppComponent {
   private simulate(probesConfigurations: ProbeControl[]): void {
     let moves = this.probeService.getMoves(); // Recupera a lista de movimentos possíveis.
 
-    probesConfigurations.forEach((probe) => {
+    probesConfigurations.forEach((probe, index) => {
       let listCommands = probe.listCommands; // Recupera a lista de comandos.
 
       for (let i = 0; i <= listCommands.length; i++) { // Lê cada um dos caracteres.
@@ -255,6 +257,10 @@ export class AppComponent {
           }
         });
       }
+
+      if (this.hasLastIndex(probesConfigurations.length, index)) {
+        this.setProbesInMesh(this.meshGroupTO, probesConfigurations, false).subscribe(() => { });
+      }
     });
   }
 
@@ -276,22 +282,26 @@ export class AppComponent {
    *
    * @param meshGroup
    * @param probesConfigurations
+   * @param isInitial
    *
    * @returns Observable<void>
    */
-  private setProbesInMesh(meshGroup: any, probesConfigurations: ProbeControl[]): Observable<void> {
+  private setProbesInMesh(meshGroup: any, probesConfigurations: ProbeControl[], isInitial: boolean): Observable<void> {
 
     return new Observable(observer => {
 
       probesConfigurations.forEach((probe, index) => {
-        let indexLine = ((meshGroup.lines.length - 1) - probe.initialPositionX);
+        let indexX = (isInitial) ? probe.initialPositionX : probe.currentPositionX;
+        let indexY = (isInitial) ? probe.initialPositionY : probe.currentPositionY;
+
+        let indexLine = ((meshGroup.lines.length - 1) - indexX);
 
         meshGroup.lines[indexLine].hasProbe = true;
         meshGroup.lines[indexLine].indexProbe = index;
 
-        meshGroup.columns[probe.initialPositionY].hasProbe = true;
-        meshGroup.columns[probe.initialPositionY].indexProbe = index;
-        meshGroup.columns[probe.initialPositionY].situation = Situation.HAS_PROBE;
+        meshGroup.columns[indexY].hasProbe = true;
+        meshGroup.columns[indexY].indexProbe = index;
+        meshGroup.columns[indexY].situation = Situation.HAS_PROBE;
 
         if (this.hasLastIndex(probesConfigurations.length, index)) {
           observer.next();
@@ -341,11 +351,20 @@ export class AppComponent {
    *
    * @param line
    * @param column
+   * @param isInitial
    *
    * @returns string
    */
-  public getStyleMesh(line: any, column: any): string {
-    return (line.hasProbe && column.hasProbe && line.indexProbe === column.indexProbe) ? 'bg-info' : 'bg-danger';
+  public getStyleMesh(line: any, column: any, isInitial: boolean): string {
+    let style = 'bg-danger';
+
+    if (isInitial) {
+      style = (line.hasProbe && column.hasProbe && line.indexProbe === column.indexProbe) ? 'bg-info' : 'bg-danger';
+    } else {
+      style = (line.hasProbe && column.hasProbe && line.indexProbe === column.indexProbe) ? 'bg-sucess' : 'bg-danger';
+    }
+
+    return style;
   }
 
   /**
