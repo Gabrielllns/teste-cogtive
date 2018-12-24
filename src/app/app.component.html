@@ -21,7 +21,7 @@
                 maxlength="3" required>
 
               <div class="ml-3">
-                <label>Desabilitar verificação de matriz quadrada</label>
+                <label><small>Desabilitar verificação de matriz quadrada</small></label>
                 <input type="checkbox" [value]="true" class="form-control" [(ngModel)]="meshConfigurations.isDisabledRoleSquareMatrix"
                   name="isDisabledRoleSquareMatrix" #isDisabledRoleSquareMatrix="ngModel">
               </div>
@@ -81,8 +81,6 @@
 
           <form class="form-horizontal" #formControlProbes="ngForm" (ngSubmit)="startSimulation(formControlProbes, probesConfigurations)"
             novalidate>
-
-            <span>LMLMLMLMM - MMRMMRMRRM</span>
 
             <div *ngFor="let probe of probesConfigurations; let i = index;">
               <div class="row">
